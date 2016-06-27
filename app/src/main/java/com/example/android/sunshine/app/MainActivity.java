@@ -68,10 +68,11 @@ public class MainActivity extends ActionBarActivity {
         }
 
         if (id == R.id.action_locate) {
-
-            //Dixit::Fetching Location value from Shared Prefernces
-            SharedPreferences locPref = PreferenceManager.getDefaultSharedPreferences(this);
-            String location = locPref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+            //Commneted in Lesson 4c
+            ////Dixit::Fetching Location value from Shared Prefernces
+            //SharedPreferences locPref = PreferenceManager.getDefaultSharedPreferences(this);
+            //String location = locPref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+            String location = Utility.getPreferredLocation(this);
 
             Uri geoUri = Uri.parse("geo:0,0?").buildUpon().appendQueryParameter("q",location).build();
 
