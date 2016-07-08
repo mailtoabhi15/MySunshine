@@ -199,6 +199,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mForecastAdapter.swapCursor(null);
     }
 
+    public void onLocationChanged(){
+
+        updateWeather();
+        getLoaderManager().restartLoader(FORECAST_LOADER,null,this);
+
+    }
+
     //Dixit:Function Creating FetchWeatherTask & reading data from SharedPrefer on Refresh & AppStart
     public void updateWeather(){
 
@@ -217,12 +224,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         weatherTask.execute(location);
     }
 
-    @Override
-    //Dixit::Calling UpdateWeather in OnStart so that when Application Start it fetches the Latest Data & Display
-    public void onStart() {
-        super.onStart();
-        updateWeather();
-    }
+    //Dixit:Commented in 4c Loaders after fixing location changed update, as
+    //we have DB now so no need to fecth n/w data continuoualsy.
+//    @Override
+//    //Dixit::Calling UpdateWeather in OnStart so that when Application Start it fetches the Latest Data & Display
+//    public void onStart() {
+//        super.onStart();
+//        updateWeather();
+//    }
 
     @Override
     public void onPause() {
