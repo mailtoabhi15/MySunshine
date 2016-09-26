@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.format.Time;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
@@ -298,6 +297,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 // Student: call bulkInsert to add the weatherEntries to the database here
                 ContentValues[] cVArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cVArray);
+                //Dixit:as we can't insert vector directly we convert it into array first
                mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI,cVArray);
             }
 
