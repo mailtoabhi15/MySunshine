@@ -24,8 +24,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import java.net.URI;
-
 public class WeatherProvider extends ContentProvider {
 
     // The URI Matcher used by this content provider.
@@ -365,6 +363,7 @@ public class WeatherProvider extends ContentProvider {
                             returnCount++;
                         }
                     }
+                    //if we don't call this, then the records will not be committed when we do endtransaction.
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
