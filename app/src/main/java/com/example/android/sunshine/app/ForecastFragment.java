@@ -161,6 +161,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
         // Prepare the loader.  Either re-connect with an existing one,
         // or start a new one.
+        //Dixit: when using loader in fragment, we initialise the loader in "onActivityCreated" method
         getLoaderManager().initLoader(FORECAST_LOADER, null, this);
 
         super.onActivityCreated(savedInstanceState);
@@ -176,6 +177,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
                 locationSetting, System.currentTimeMillis());
 
+        //Dixit-imp: Cursor loader will call Content provider on our behalf,Since Cursor loader is derived from AsyncTaskLoader
+        // it will be executed in Backgroud Thread
         return new CursorLoader(getActivity(),
                 weatherForLocationUri,
                 FORECAST_COLUMNS,
@@ -185,15 +188,16 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
-    //Called when Loader completes & our data is Ready , to use data in Our Cursor Adapter we just call SwapCursor
-    // and it is here we perform anyother UI
+    //Dixit-imp:Called when Loader completes & our data is Ready , to use data in Our Cursor Adapter we just call SwapCursor
+    // and it is here we perform anyother UI updates we want to amke when the data is ready
     @Override
     public void onLoadFinished(Loader loader, Cursor cursor) {
         mForecastAdapter.swapCursor(cursor);
     }
 
 
-    // called when our loader is being destroyed, it means we need to remove all refrences to loader data
+    //Dixit-imp: called when our loader is being destroyed, it means we need to remove all refrences to loader data
+    //to do that we call swapCursor with "null"
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mForecastAdapter.swapCursor(null);

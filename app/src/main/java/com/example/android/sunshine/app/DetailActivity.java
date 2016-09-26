@@ -49,6 +49,7 @@ public class DetailActivity extends ActionBarActivity {
 
         // Attach an intent to this ShareActionProvider.  You can update this at any time,
         // like when the user selects a new piece of data they might like to share.
+        //Dixit: If onLoadFinished happens before this, we can go ahead & set the Share Intent
         if (mShareActionProvider != null ) {
                 Intent shareAct = new Intent(Intent.ACTION_SEND);
                 //Dixit: added below flag so to prevent the activity we r sharing to
