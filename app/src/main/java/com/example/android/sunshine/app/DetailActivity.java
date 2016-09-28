@@ -2,6 +2,7 @@ package com.example.android.sunshine.app;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -28,9 +29,26 @@ public class DetailActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        //Dixit: lesson-5.39(2 Pane Ui), updating the detail container id is, this is soley for the one
+        // pane case, since in the two pane case, you won’t have a DetailActivity, just a MainActivity
+        // with a DetailFragment inside of it.
         if (savedInstanceState == null) {
+
+            //Dixit:start added in lesson-5.40(2 Pane Ui)-Handling List Item Click
+
+            // Create the detail fragment and add it to the activity
+            // using a fragment transaction.
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+
+            DetailFragment fragment = new DetailFragment();
+
+            fragment.setArguments(arguments);
+            //Dixit:end
+
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new DetailFragment())
+                    .add(R.id.weather_detail_container, fragment)
                     .commit();
         }
     }
@@ -92,6 +110,11 @@ public class DetailActivity extends ActionBarActivity {
     public static class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
         private static final String LOG_TAG = DetailFragment.class.getSimpleName();
+
+        //Dixit: added in lesson-5.40(2 Pane Ui)-Handling List Item Click
+        static final String DETAIL_URI = "URI";
+        private Uri mUri;
+
         private String mForecast;
 
         private static final int DETAIL_FORECAST_LOADER = 0;
@@ -120,6 +143,14 @@ public class DetailActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
+            //Dixit-imp:start: added in lesson-5.40(2 Pane Ui)-Handling List Item Click
+            //Reading the saved bundle arguments i.e clicked uri/item, if the activity was killed/started
+            Bundle args = getArguments();
+            if (args!= null) {
+               mUri = args.getParcelable(DetailFragment.DETAIL_URI);
+             }
+            //Dixit:end
+
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
             return rootView;
@@ -135,22 +166,53 @@ public class DetailActivity extends ActionBarActivity {
             super.onActivityCreated(savedInstanceState);
         }
 
+        //Dixit:start:Added in lesson-5.40(2 Pane Ui)-Handling List Item Click
+        void onLocationChanged( String newLocation ) {
+        // replace the uri, since the location has changed
+            Uri uri = mUri;
+            if (null != uri) {
+               long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
+                Uri updatedUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+                mUri = updatedUri;
+                getLoaderManager().restartLoader(DETAIL_FORECAST_LOADER, null, this);
+               }
+            }
+        //Dixit:end
+
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-            //Dixit: DetailActivity called via intent we sent from ForecatFragement onClicking the weather data
-            Intent intent = getActivity().getIntent();
-            if(intent == null) {
-                return null;
+            Log.v(LOG_TAG, "In onCreateLoader");
+
+            //Dixit-imp:start:Added in lesson-5.40(2 Pane Ui)-Handling List Item Click
+            //so as to remove belwo code which relied upon the incoming intent & switch to
+            //mUri instead. As weather this DetailFragment is in Main or Detail Activity, this
+           // mUri should be set
+
+//            //Dixit: DetailActivity called via intent we sent from ForecatFragement onClicking the weather data
+//            Intent intent = getActivity().getIntent();
+//
+//            //Dixit: update din lesson-5.39(2 Pane UI), If DetailFragment is created without a uri (as in intent.data() == null),
+//            // it should not try to create a loader.
+//            if(intent == null || intent.getData() == null) {
+//                return null;
+//            }
+
+
+            if(mUri != null)
+            {
+                // Now create and return a CursorLoader that will take care of
+                // creating a Cursor for the data being displayed.
+                return new CursorLoader(getActivity(),
+                        mUri,
+                        DETAIL_FORECAST_COLUMNS,
+                        null,
+                        null,
+                        null);
+
             }
-            // Now create and return a CursorLoader that will take care of
-            // creating a Cursor for the data being displayed.
-            return new CursorLoader(getActivity(),
-                    intent.getData(),
-                    DETAIL_FORECAST_COLUMNS,
-                    null,
-                    null,
-                    null);
+            return null;
+            //Dixit:end
         }
 
         @Override
