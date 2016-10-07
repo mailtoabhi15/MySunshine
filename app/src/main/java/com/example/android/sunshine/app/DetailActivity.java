@@ -30,7 +30,7 @@ public class DetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        //Dixit: lesson-5.39(2 Pane Ui), updating the detail container id is, this is soley for the one
+        //Dixit: lesson-5.39(2 Pane Ui), updating the detail container id is, this is solely for the one
         // pane case, since in the two pane case, you won’t have a DetailActivity, just a MainActivity
         // with a DetailFragment inside of it.
         if (savedInstanceState == null) {

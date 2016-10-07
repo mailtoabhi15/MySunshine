@@ -1,13 +1,14 @@
 package com.example.android.sunshine.app;
 
-import android.content.SharedPreferences;
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
+import android.support.annotation.Nullable;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -73,4 +74,20 @@ public class SettingsActivity extends PreferenceActivity
         return true;
     }
 
+    //Dixit-Imp: Lesson-5.41:There's an issue where, in 2 Pane mode, if we got to SettingsActivity & Click
+    //Navigation UP Button, then the DetailFragment is Blank coz the BrandNew Instance of MainActivity
+    //gets Launched & for this New Instance No Item is Selected yet.
+    //To Fix this we need to get/navigate to the Previous Instance of MainActivity which has the Item selected
+    //and not create the New Instance
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @Nullable
+    @Override
+    public Intent getParentActivityIntent() {
+        //Dixit-imp:Fix to achieve what is mentioned above->we overide this method(getparentActivity), which
+        // system will call for getting the parnetActivity intent when the Navigation UP Button is clicked.
+        //Get the ParnetActivityIntent form the Super class, this will create a New Intent for mainActivity
+        // then add flag , to check if the MainActivity is already Running in our Task and use that one insteadd
+        // of creating its New Instance. This Api is added form JellyBean onwards
+        return super.getParentActivityIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    }
 }
